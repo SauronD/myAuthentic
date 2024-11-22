@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <script src="http://cdn.bootcdn.net/ajax/libs/crypto-js/4.0.0/crypto-js.js"></script>
+
+</head>
+<body>
+    <h2>Login</h2>
+    <form method="post" onsubmit="return hashPassword()">
+        {% csrf_token %}
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+
+        <input type="hidden" name="hashed_password" id="hashed_password">
+        <button type="submit">Login</button>
+    </form>
+
+    <script>
+        function hashPassword() {
+
+            const password = document.getElementById('password').value;
+
+           // 使用SHA-256进行哈希处理
+            const hashedPassword = CryptoJS.SHA256(password).toString(CryptoJS.enc.Base64);
+
+            document.getElementById('password').value = hashedPassword;
+
+
+            return true;
+        }
+    </script>
+</body>
+</html>
