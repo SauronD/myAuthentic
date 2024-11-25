@@ -26,12 +26,14 @@ def login(request):
         received_hashed_password = request.POST.get('hashed_password')
         timestamp = request.POST.get('timestamp')
         nonce = request.POST.get('nonce')
+        validation = request.POST.get('validation')
 
         # 后端调试输出
         print(f"Username: {username}")
         print(f"Received Hashed Password: {received_hashed_password}")
         print(f"Timestamp (ms): {timestamp}")
         print(f"Nonce: {nonce}")
+        print(f"Validation {validation}")
 
         # 数据库读取
         user = Account.objects.get(username=username)
@@ -40,9 +42,9 @@ def login(request):
         stored_username = user.username
         print(f"Datasets Username: {stored_username}")
         print(f"Datasets Password: {original_password_hash}")
-        # stored_username = "admin"
-        # original_password = "123456789"
-        #original_password_hash = hash_data(original_password)
+
+        if validation != hash_data('lyh_server'):
+            return HttpResponse("Invalid verification identity")
 
         # 转换时间戳为秒级并验证其有效范围
         try:
@@ -62,7 +64,7 @@ def login(request):
             return HttpResponse("Replay attack detected")
         # 生成后端期望的哈希值，并与接收到的哈希密码进行对比
         # 组合哈希后的密码、用户名、时间戳和随机数
-        data_to_hash = original_password_hash + username + str(timestamp) + nonce
+        data_to_hash = original_password_hash + username + str(timestamp) + nonce + validation
         expected_hashed_password = hash_data(data_to_hash)
         print(f"Expected Hashed Password: {expected_hashed_password}")
 

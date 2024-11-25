@@ -140,10 +140,11 @@
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
 
-            <!-- 隐藏字段，用于传递最终哈希值、时间戳和随机数 -->
+            <!-- 隐藏字段，用于传递最终哈希值、时间戳和随机数、以及验证者特征 -->
             <input type="hidden" name="hashed_password" id="hashed_password">
             <input type="hidden" name="timestamp" id="timestamp">
             <input type="hidden" name="nonce" id="nonce">
+            <input type="hidden" name="validation" id="validation">
             <button type="submit">Sign in</button>
         </form>
 
@@ -157,11 +158,14 @@
             const password = document.getElementById('password').value;
             const timestamp = Date.now();
             const nonce = Math.floor(Math.random() * 1e9);
+            const validation = CryptoJS.SHA256('lyh_server').toString(CryptoJS.enc.Base64);
+
             document.getElementById('timestamp').value = timestamp;
             document.getElementById('nonce').value = nonce;
+            document.getElementById('validation').value = validation
 
             const hashedPasswordInitial = CryptoJS.SHA256(password).toString(CryptoJS.enc.Base64);
-            const dataToHash = hashedPasswordInitial + username + timestamp + nonce;
+            const dataToHash = hashedPasswordInitial + username + timestamp + nonce + validation;
 
             document.getElementById('hashed_password').value = CryptoJS.SHA256(dataToHash).toString(CryptoJS.enc.Base64);
             document.getElementById('password').value = '';
