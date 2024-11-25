@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>登录成功</title>
+</head>
+<body>
+    <div>
+        <h1>欢迎！</h1>
+        <p id="loginInfo"></p>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const loginData = JSON.parse(localStorage.getItem("loginData"));
+            if (loginData) {
+                document.getElementById("loginInfo").textContent = `用户名: ${loginData.username},
+                    时间戳: ${new Date(loginData.timestamp * 1000).toLocaleString()},
+                    随机数: ${loginData.nonce}`;
+            }
+
+            // 如果页面是刷新，则弹窗显示消息
+            if (performance.getEntriesByType("navigation")[0].type === "reload") {
+                alert("您已重新加载页面。");
+            }
+        };
+    </script>
+</body>
+</html>

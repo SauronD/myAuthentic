@@ -86,6 +86,7 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
     </style>
 </head>
 <body>
@@ -106,7 +107,7 @@
             <button type="submit">Register</button>
         </form>
 
-        <button class="login-btn" onclick="window.location.href='http://127.0.0.1:8000/'">Sign in</button>
+        <button class="login-btn" onclick="window.location.href='http://127.0.0.1:8082/'">Sign in</button>
     </div>
 
     <script>
@@ -140,7 +141,7 @@
             .then(data => {
                 alert(data.message);  // 显示后端返回的消息
                 if (data.message === "Registration successful") {
-                    window.location.href = "http://127.0.0.1:8000/";  // 跳转到登录页面
+                    window.location.href = "http://127.0.0.1:8082/";  // 跳转到登录页面
                 }
             })
             .catch(error => {

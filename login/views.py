@@ -1,5 +1,6 @@
-from django.shortcuts import render
-from django.http import HttpResponse,JsonResponse
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, JsonResponse
+from django.contrib import messages
 from login.models import Account
 import time
 import hashlib
@@ -16,6 +17,7 @@ def hash_data(data):
 def login(request):
     # admin 123456
     # admin2 123456789
+    # llw 123
     client_ip = request.META['REMOTE_ADDR']
     print(f"Client_ip:{client_ip}")
     if request.method == 'POST':
@@ -51,13 +53,13 @@ def login(request):
 
             if abs(current_time - valid_timestamp) > 60:
                 return HttpResponse("Timestamp invalid or request expired")
+
         except ValueError:
             return HttpResponse("Invalid timestamp")
 
         # 验证 nonce 是否已使用
         if nonce in used_nonces:
             return HttpResponse("Replay attack detected")
-
         # 生成后端期望的哈希值，并与接收到的哈希密码进行对比
         # 组合哈希后的密码、用户名、时间戳和随机数
         data_to_hash = original_password_hash + username + str(timestamp) + nonce
@@ -76,10 +78,22 @@ def login(request):
                     del used_nonces[stored_nonce]
 
             return HttpResponse("Login successful")
+            # response_data = {
+            #     "message": "Login successful",
+            #     "username": stored_username,
+            #     "timestamp": timestamp,
+            #     "nonce": nonce
+            # }
+            # return JsonResponse(response_data, status=200)
+
         else:
-            return HttpResponse("Invalid username or password")
+            # return HttpResponse("Invalid username or password")
+            messages.error(request, "Invalid username or password")
+            return redirect('login:login')
+            # return JsonResponse({"message": "Invalid username or password"}, status=400)
 
     return render(request, 'login.html')
+
 
 def register(request):
     if request.method == "POST":
@@ -97,6 +111,9 @@ def register(request):
 
         Account.objects.create(username=username, hashed_password=received_hashed_password)
 
-        return HttpResponse("Registration successful")
+        return JsonResponse({"message": "Registration successful"},status=200)
 
     return render(request, 'register.html')
+
+def success(request):
+    return render(request, 'success.html')

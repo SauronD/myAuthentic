@@ -89,11 +89,49 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        /* 错误消息容器 */
+        .error-message-container {
+            margin-bottom: 20px;
+            text-align: center;
+            animation: fadeIn 0.5s ease; /* 淡入效果 */
+        }
+
+        /* 错误消息样式 */
+        .error-message {
+            color: #D8000C;
+            background-color: #FFD2D2;
+            border: 1px solid #D8000C;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        /* 添加消息显示的动画 */
+        .error-message-container .error-message {
+            animation: slideDown 0.5s ease;
+        }
+
+        /* 淡入和下滑动画 */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
     </style>
 </head>
 <body>
-    <div class="login-container">
+   <div class="login-container">
         <h2>Login</h2>
+       {% if messages %}
+         <div class="error-message-container">
+             {% for message in messages %}
+                <div class="error-message">{{ message }}</div>
+             {% endfor %}
+    </div>
+{% endif %}
         <form method="post" onsubmit="return hashPassword()">
             {% csrf_token %}
             <label for="username">Username:</label>
@@ -106,14 +144,15 @@
             <input type="hidden" name="hashed_password" id="hashed_password">
             <input type="hidden" name="timestamp" id="timestamp">
             <input type="hidden" name="nonce" id="nonce">
-            <button type="submit">Login</button>
+            <button type="submit">Sign in</button>
         </form>
 
-        <button class="register-btn" onclick="window.location.href='{% url 'login:register' %}'">Go to Register</button>
+        <button class="register-btn" onclick="window.location.href='{% url 'login:register' %}'">Sign up</button>
     </div>
 
+
     <script>
-        function hashPassword() {
+            function hashPassword() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const timestamp = Date.now();
@@ -123,9 +162,8 @@
 
             const hashedPasswordInitial = CryptoJS.SHA256(password).toString(CryptoJS.enc.Base64);
             const dataToHash = hashedPasswordInitial + username + timestamp + nonce;
-            const hashedPasswordFinal = CryptoJS.SHA256(dataToHash).toString(CryptoJS.enc.Base64);
 
-            document.getElementById('hashed_password').value = hashedPasswordFinal;
+            document.getElementById('hashed_password').value = CryptoJS.SHA256(dataToHash).toString(CryptoJS.enc.Base64);
             document.getElementById('password').value = '';
             return true;
         }
