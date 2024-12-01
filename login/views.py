@@ -36,7 +36,11 @@ def login(request):
         print(f"Validation {validation}")
 
         # 数据库读取
-        user = Account.objects.get(username=username)
+        #user = Account.objects.get(username=username)
+        user = Account.objects.filter(username=username).first()
+        if user is None:
+            messages.error(request, "Account does not exist")
+            return redirect('login:login')
         original_password_hash = user.hashed_password
         # 假设的固定用户名和原始密码的哈希值（例如 SHA-256 哈希后的 "123456"）
         stored_username = user.username
@@ -92,6 +96,7 @@ def login(request):
             # return HttpResponse("Invalid username or password")
             messages.error(request, "Invalid username or password")
             return redirect('login:login')
+
             # return JsonResponse({"message": "Invalid username or password"}, status=400)
 
     return render(request, 'login.html')
